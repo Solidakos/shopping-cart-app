@@ -17,26 +17,27 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class DVDController {
     private final DVDRepository repo;
 
-    DVDController(DVDRepository repo) {
+    private final DVDModelAssembler assembler;
+
+    DVDController(DVDRepository repo, DVDModelAssembler assembler) {
         this.repo = repo;
+        this.assembler = assembler;
     }
 
     @GetMapping("/dvds")
     public CollectionModel<EntityModel<DVD>> all() {
-        List<EntityModel<DVD>> dvds = repo.findAll().stream().map(dvd -> EntityModel.of(dvd,
-                linkTo(methodOn(DVDController.class).one(dvd.getId())).withSelfRel(),
-                linkTo(methodOn(DVDController.class).all()).withRel("dvds"))).collect(Collectors.toList());
+        List<EntityModel<DVD>> dvds = repo.findAll()
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
 
-        return CollectionModel.of(dvds,
-                linkTo(methodOn(DVDController.class).all()).withSelfRel());
+        return CollectionModel.of(dvds, linkTo(methodOn(DVDController.class).all()).withSelfRel());
     }
 
     @GetMapping("/dvds/{id}")
     EntityModel<DVD> one(@PathVariable Integer id) {
         DVD dvd = repo.findById(id).orElseThrow(() -> new DVDNotFoundException(id));
 
-        return EntityModel.of(dvd,
-                linkTo(methodOn(DVDController.class).one(id)).withSelfRel(),
-                linkTo(methodOn(DVDController.class).all()).withRel("dvds"));
+        return assembler.toModel(dvd);
     }
 }
