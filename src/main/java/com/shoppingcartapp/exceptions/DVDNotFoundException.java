@@ -1,8 +1,8 @@
-package com.shoppingcartapp.controllers;
+package com.shoppingcartapp.exceptions;
 
 public class DVDNotFoundException extends RuntimeException{
 
-    DVDNotFoundException(Integer id) {
+    public DVDNotFoundException(Integer id) {
         super("Could not find DVD " + id);
       }
     

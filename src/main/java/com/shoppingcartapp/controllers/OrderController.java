@@ -3,8 +3,10 @@ package com.shoppingcartapp.controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.shoppingcartapp.components.OrderModelAssembler;
 import com.shoppingcartapp.entities.Order;
 import com.shoppingcartapp.entities.Status;
+import com.shoppingcartapp.exceptions.OrderNotFoundException;
 import com.shoppingcartapp.repositories.OrderRepository;
 
 import org.springframework.hateoas.CollectionModel;
@@ -51,7 +53,6 @@ public class OrderController {
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
         return assembler.toModel(order);
-
     }
 
     @PostMapping("/orders")
@@ -59,7 +60,6 @@ public class OrderController {
 
         order.setStatus(Status.CREATED);
         Order newOrder = orderRepo.save(order);
-
         return ResponseEntity
                 .created(linkTo(methodOn(OrderController.class).one(newOrder.getId())).toUri())
                 .body(assembler.toModel(newOrder));
@@ -83,16 +83,54 @@ public class OrderController {
                         .withDetail("You can't cancel an order that is in the " + order.getStatus() + " status"));
     }
 
-    public Class<?> complete(int id) {
-        return null;
+    @RequestMapping("/orders/{id}/complete")
+    public ResponseEntity<?> complete(@PathVariable int id) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+
+        if (order.getStatus() == Status.IN_PROGRESS) {
+            order.setStatus(Status.COMPLETED);
+            return ResponseEntity.ok(assembler.toModel(orderRepo.save(order)));
+        }
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
+                .body(Problem.create()
+                        .withTitle("Method not allowed")
+                        .withDetail("You can't complete an order that is in the " + order.getStatus() + " status"));
     }
 
-    public Object charge(int id) {
-        return null;
+    @RequestMapping("/orders/{id}/charge")
+    public ResponseEntity<?> charge(@PathVariable int id) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+
+        if (order.getStatus() == Status.CREATED) {
+            order.setStatus(Status.CHARGED);
+            return ResponseEntity.ok(assembler.toModel(orderRepo.save(order)));
+        }
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
+                .body(Problem.create()
+                        .withTitle("Method not allowed")
+                        .withDetail("You can't charge an order that is in the " + order.getStatus() + " status"));
     }
 
-    public Class<?> inprogress(int id) {
-        return null;
-    }
+    @RequestMapping("/orders/{id}/in-progress")
+    public ResponseEntity<?> inprogress(@PathVariable int id) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
 
+        if (order.getStatus() == Status.CHARGED) {
+            order.setStatus(Status.IN_PROGRESS);
+            return ResponseEntity.ok(assembler.toModel(orderRepo.save(order)));
+        }
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
+                .body(Problem.create()
+                        .withTitle("Method not allowed")
+                        .withDetail("You can't progress an order that is in the " + order.getStatus() + " status"));
+    }
 }

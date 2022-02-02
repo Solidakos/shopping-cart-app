@@ -1,5 +1,6 @@
-package com.shoppingcartapp.controllers;
+package com.shoppingcartapp.components;
 
+import com.shoppingcartapp.controllers.DVDController;
 import com.shoppingcartapp.entities.DVD;
 
 import org.springframework.hateoas.EntityModel;

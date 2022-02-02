@@ -3,7 +3,9 @@ package com.shoppingcartapp.controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.shoppingcartapp.components.DVDModelAssembler;
 import com.shoppingcartapp.entities.DVD;
+import com.shoppingcartapp.exceptions.DVDNotFoundException;
 import com.shoppingcartapp.repositories.DVDRepository;
 
 import org.springframework.hateoas.CollectionModel;

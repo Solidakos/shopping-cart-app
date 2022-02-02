@@ -1,4 +1,4 @@
-package com.shoppingcartapp.controllers;
+package com.shoppingcartapp.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

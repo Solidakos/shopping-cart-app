@@ -1,5 +1,6 @@
-package com.shoppingcartapp.controllers;
+package com.shoppingcartapp.components;
 
+import com.shoppingcartapp.controllers.OrderController;
 import com.shoppingcartapp.entities.Order;
 import com.shoppingcartapp.entities.Status;
 
@@ -20,9 +21,11 @@ public class OrderModelAssembler implements RepresentationModelAssembler<Order, 
         if (order.getStatus() == Status.CREATED) {
             orderModel.add(linkTo(methodOn(OrderController.class).charge(order.getId())).withRel("charge"));
             orderModel.add(linkTo(methodOn(OrderController.class).cancel(order.getId())).withRel("cancel"));
-        } else if (order.getStatus() == Status.CHARGED) {
+        } 
+        if (order.getStatus() == Status.CHARGED) {
             orderModel.add(linkTo(methodOn(OrderController.class).inprogress(order.getId())).withRel("in-progress"));
-        } else if (order.getStatus() == Status.IN_PROGRESS) {
+        }
+        if (order.getStatus() == Status.IN_PROGRESS) {
             orderModel.add(linkTo(methodOn(OrderController.class).complete(order.getId())).withRel("complete"));
         }
         return orderModel;
