@@ -35,7 +35,7 @@ public class DVDController {
     }
 
     @GetMapping("/dvds/{id}")
-    EntityModel<DVD> one(@PathVariable Integer id) {
+    public EntityModel<DVD> one(@PathVariable Integer id) {
         DVD dvd = repo.findById(id).orElseThrow(() -> new DVDNotFoundException(id));
 
         return assembler.toModel(dvd);

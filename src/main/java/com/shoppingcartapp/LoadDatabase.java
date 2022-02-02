@@ -1,7 +1,10 @@
 package com.shoppingcartapp;
 
 import com.shoppingcartapp.entities.DVD;
+import com.shoppingcartapp.entities.Order;
+import com.shoppingcartapp.entities.Status;
 import com.shoppingcartapp.repositories.DVDRepository;
+import com.shoppingcartapp.repositories.OrderRepository;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -17,10 +20,13 @@ public class LoadDatabase {
     String[] actors2 = new String[] { "Dev Patel", "Alicia Vikander", "Joel Edgerton" };
 
     @Bean
-    CommandLineRunner initDatabase(DVDRepository repo) {
+    CommandLineRunner initDatabase(DVDRepository dvdRepository, OrderRepository orderRepository) {
         return args -> {
-            log.info("Preloading " + repo.save(new DVD("Dune", actors1, "Denis Villeneuve", "Sci-Fi", 155, 30)));
-            log.info("Preloading " + repo.save(new DVD("The Green Knight", actors2, "David Lowery", "Medieval Fantasy", 130, 20)));
+            log.info("Preloading "
+                    + dvdRepository.save(new DVD("Dune", actors1, "Denis Villeneuve", "Sci-Fi", 155, 30)));
+            log.info("Preloading " + dvdRepository
+                    .save(new DVD("The Green Knight", actors2, "David Lowery", "Medieval Fantasy", 130, 20)));
+            log.info("Preloading " + orderRepository.save(new Order("Test 123", Status.CREATED)));
         };
     }
 
